@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "M3U8 捕手",
+  "version": "0.3.2",
+  "description": "自动发现 m3u8 地址，区分 HTTP 2xx 正常与异常请求，支持当前网页、持久历史、搜索复制和备份。",
+  "permissions": ["webRequest", "webNavigation", "storage", "clipboardWrite", "unlimitedStorage"],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "background": { "service_worker": "background.js", "type": "module" },
+  "action": {
+    "default_title": "M3U8 捕手 · 查看当前网页资源",
+    "default_popup": "popup.html",
+    "default_icon": { "16": "icons/16.png", "32": "icons/32.png" }
+  },
+  "icons": {
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  }
+}

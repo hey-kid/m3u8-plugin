@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <title>M3U8 捕手</title>
+  </head>
+  <body>
+    <main class="app">
+      <header class="app-header">
+        <div class="brand">
+          <div class="brand-icon" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 6h14M5 12h8M5 18h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="m17 11 5 4-5 4v-8Z" fill="currentColor"/></svg>
+          </div>
+          <div><h1>M3U8 捕手</h1><p class="brand-caption">发现每个地址，留住每次发现</p></div>
+        </div>
+        <span id="monitor-state" class="monitor-state"><span class="status-dot"></span><span id="monitor-label">正在连接</span></span>
+      </header>
+
+      <nav class="view-tabs" role="tablist" aria-label="资源范围">
+        <button id="view-current" type="button" role="tab" aria-selected="true" aria-controls="resource-panel" class="view-tab is-active" data-testid="view-current">当前网页</button>
+        <button id="view-history" type="button" role="tab" tabindex="-1" aria-selected="false" aria-controls="resource-panel" class="view-tab" data-testid="view-history">全部历史<span id="history-total" class="tab-count" data-testid="history-total">0</span></button>
+      </nav>
+
+      <section id="page-context" class="page-context" aria-label="当前网页">
+        <div class="page-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01" stroke-linecap="round"/></svg></div>
+        <div class="page-copy"><span class="eyebrow">当前网页</span><h2 id="page-title">正在读取网页…</h2><p id="page-domain">—</p></div>
+      </section>
+
+      <section id="history-context" class="history-context" aria-label="本地历史" hidden>
+        <div class="history-context-icon" aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8" stroke-linecap="round"/><path d="M3 3v5h5M12 7v5l3 2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div><h2>所有网站，统一归档</h2><p>刷新、关闭标签页或重启后，记录依然保留</p></div>
+      </section>
+
+      <div id="history-tools" class="history-tools" hidden>
+        <label class="search-field"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5" stroke-linecap="round"/></svg><input id="history-search" data-testid="history-search" type="search" placeholder="搜索地址、网站或网页标题" aria-label="搜索历史地址、网站或网页标题" autocomplete="off" maxlength="500" /></label>
+        <button id="export-history" data-testid="export-history" class="export-button" type="button" title="导出全部历史为 JSON 备份，不受搜索条件影响" disabled><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M4 16v4h16v-4" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="export-label">导出备份</span></button>
+      </div>
+      <p id="history-warning" class="history-warning" role="alert" hidden></p>
+
+      <div class="status-controls">
+        <div class="status-filters" role="group" aria-label="请求状态筛选">
+          <button id="status-normal" data-testid="status-normal" class="status-filter is-active" data-category="normal" type="button" aria-pressed="true" title="HTTP 200–299（包括 206）且没有网络错误"><span class="filter-dot" aria-hidden="true"></span>正常<span data-status-count>0</span></button>
+          <button id="status-abnormal" data-testid="status-abnormal" class="status-filter" data-category="abnormal" type="button" aria-pressed="false"><span class="filter-dot"></span>异常<span data-status-count>0</span></button>
+          <button id="status-pending" data-testid="status-pending" class="status-filter" data-category="pending" type="button" aria-pressed="false">待确认<span data-status-count>0</span></button>
+          <button id="status-all" data-testid="status-all" class="status-filter" data-category="all" type="button" aria-pressed="false">全部<span data-status-count>0</span></button>
+        </div>
+        <p id="status-hint" class="status-hint">正常：HTTP 2xx 且无网络错误；右侧徽标表示地址数量。</p>
+      </div>
+
+      <section id="resource-panel" class="resources" role="tabpanel" aria-labelledby="view-current">
+        <div class="section-heading">
+          <div class="section-title"><h2 id="resources-title">发现的资源</h2><span id="resource-count" class="count-badge" data-testid="resource-count">0</span></div>
+          <span id="list-caption" class="list-caption">自动去重 · 实时更新</span>
+        </div>
+        <div id="loading-state" class="state-panel" role="status"><span class="loading-ring" aria-hidden="true"></span><p class="state-title">正在读取资源</p><p class="state-description">很快就好…</p></div>
+        <div id="empty-state" class="state-panel" data-testid="empty-state" hidden>
+          <div class="empty-illustration" aria-hidden="true"><svg width="56" height="56" viewBox="0 0 56 56" fill="none"><rect x="10" y="8" width="31" height="38" rx="7" fill="white" stroke="#CFDAE9" stroke-width="1.5"/><path d="M18 18h15M18 25h10M18 32h7" stroke="#B5C5DA" stroke-width="2" stroke-linecap="round"/><circle cx="38" cy="36" r="10" fill="#EAF1FF" stroke="#7095DB" stroke-width="1.5"/><path d="m45 44 5 5" stroke="#7095DB" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+          <p id="empty-title" class="state-title">等待发现 m3u8 资源</p>
+          <p id="empty-description" class="state-description">试着播放网页中的视频，<br />发现的地址会自动出现在这里。</p>
+          <span id="empty-hint" class="empty-hint">已打开的网页，可刷新后重新捕获</span>
+        </div>
+        <div id="error-state" class="state-panel" role="alert" hidden><p class="state-title">暂时无法读取资源</p><p id="error-message" class="state-description"></p><button id="retry-button" class="retry-button" type="button">重新读取</button></div>
+        <ol id="resource-list" class="resource-list" aria-label="m3u8 地址列表" hidden></ol>
+        <p id="limit-notice" class="limit-notice" hidden>当前页已保留 300 条地址，后续新地址暂不加入列表。</p>
+        <div id="history-pagination" class="history-pagination" hidden>
+          <span id="history-page-info" data-testid="history-page-info"></span>
+          <div class="pagination-actions"><button id="history-prev" class="pagination-button" data-testid="history-prev" type="button" aria-label="上一页">上一页</button><button id="history-next" class="pagination-button" data-testid="history-next" type="button" aria-label="下一页">下一页</button></div>
+        </div>
+      </section>
+
+      <footer class="app-footer">
+        <button id="copy-all" class="primary-button" type="button" data-testid="copy-all" disabled>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>
+          <span id="copy-all-label">全部复制</span>
+        </button>
+        <p class="footer-note"><span class="privacy-dot" aria-hidden="true"></span><span id="footer-note">地址自动存入本机历史，不自动删除</span></p>
+      </footer>
+      <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+      <dialog id="delete-dialog" class="delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-description">
+        <div class="dialog-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h2 id="delete-title">删除这条历史？</h2><p id="delete-resource-name" class="delete-resource-name"></p><p id="delete-description">仅从历史中移除，当前网页列表仍保留。<br />以后再次捕获此地址时，会重新保存。</p>
+        <p id="delete-error" class="dialog-error" role="alert" hidden></p>
+        <div class="dialog-actions"><button id="cancel-delete" data-testid="cancel-delete" class="dialog-cancel" type="button">取消</button><button id="confirm-delete" data-testid="confirm-delete" class="dialog-confirm" type="button">删除记录</button></div>
+      </dialog>
+    </main>
+    <script type="module" src="/src/popup.ts"></script>
+  </body>
+</html>
